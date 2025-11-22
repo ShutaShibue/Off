@@ -1,0 +1,59 @@
+# Build results
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+*.sln.iml
+
+# NuGet packages
+*.nupkg
+packages/
+# NuGet v3
+*.snupkg
+
+# DotCover
+*.dotCover
+
+# VS for Mac
+.vscode/
+.vscode-test/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Logs
+*.log
+
+# Other
+_ReSharper*/
+*.dbmdl
+*.pidb
+*.svd
+
+# Backup & report files
+*.bak
+*.backup
+*.orig
+*.log
+*.vspscc
+*.vssscc
+*.userprefs
+
+# Publish
+publish/
+
