@@ -6,34 +6,39 @@ class Program
     {
         const int simulationCount = 100000;
         var payouts = new List<int>();
+        var blueCardCounts = new List<int>();
         Random random = new Random();
 
         // 100000セットのシミュレーションを実行
         for (int simulation = 0; simulation < simulationCount; simulation++)
         {
-            int totalPayout = RunSimulation(random);
+            var (totalPayout, blueCardCount) = RunSimulation(random);
             payouts.Add(totalPayout);
+            blueCardCounts.Add(blueCardCount);
         }
 
         // 平均と標準偏差を計算
-        double average = payouts.Average();
-        double variance = payouts.Select(p => Math.Pow(p - average, 2)).Average();
-        double standardDeviation = Math.Sqrt(variance);
+        double averagePayout = payouts.Average();
+        double variancePayout = payouts.Select(p => Math.Pow(p - averagePayout, 2)).Average();
+        double standardDeviationPayout = Math.Sqrt(variancePayout);
+        
+        double averageBlueCards = blueCardCounts.Average();
 
         // 結果を表示
         Console.WriteLine($"シミュレーション回数: {simulationCount}");
-        Console.WriteLine($"総払い出し額の平均: {average:F2}");
-        Console.WriteLine($"総払い出し額の標準偏差: {standardDeviation:F2}");
+        Console.WriteLine($"総払い出し額の平均: {averagePayout:F2}");
+        Console.WriteLine($"総払い出し額の標準偏差: {standardDeviationPayout:F2}");
+        Console.WriteLine($"平均青払い出し数: {averageBlueCards:F2}");
     }
 
     /// <summary>
-    /// 1回のシミュレーションを実行し、総払い出し額を返す
+    /// 1回のシミュレーションを実行し、総払い出し額とBlueCard作成数を返す
     /// </summary>
-    static int RunSimulation(Random random)
+    static (int totalPayout, int blueCardCount) RunSimulation(Random random)
     {
-        // プレイヤーを15人作成してリストにする
+        // プレイヤーを20人作成してリストにする
         var players = new List<Player>();
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < 20; i++)
         {
             players.Add(new Player());
         }
@@ -41,7 +46,7 @@ class Program
         // それぞれに青3枚、紫1枚を付与する
         foreach (var player in players)
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 2; i++)
             {
                 player.AddCard(new BlueCard());
             }
@@ -56,26 +61,19 @@ class Program
         players[2].AddCard(new SilverCard());
         players[3].AddCard(new SilverCard());
 
-        // それ以外（4-14）に金（GoldCard）を1枚ずつ付与
-        for (int i = 4; i < 15; i++)
+        // それ以外（4-19）に金（GoldCard）を1枚ずつ付与
+        for (int i = 4; i < 20; i++)
         {
             players[i].AddCard(new GoldCard());
         }
 
+        int totalBlueCardsCreated = 0;
+
         // ラウンドを6回実行
         for (int round = 1; round <= 6; round++)
         {
-            // ランダムに2プレイヤーを選び、swap(user1, user2, false)を行う
-            int player1Index = random.Next(players.Count);
-            int player2Index = random.Next(players.Count);
-            while (player2Index == player1Index)
-            {
-                player2Index = random.Next(players.Count);
-            }
-            SwapHelper.Swap(players[player1Index], players[player2Index], false);
-
             // iteration(24): ランダムに2プレイヤーを選び、swap(user1, user2, true)を行う
-            for (int iteration = 1; iteration <= 24; iteration++)
+            for (int iteration = 1; iteration <= 18; iteration++)
             {
                 int user1Index = random.Next(players.Count);
                 int user2Index = random.Next(players.Count);
@@ -83,7 +81,8 @@ class Program
                 {
                     user2Index = random.Next(players.Count);
                 }
-                SwapHelper.Swap(players[user1Index], players[user2Index], true);
+                int blueCardCount = SwapHelper.Swap(players[user1Index], players[user2Index], true);
+                totalBlueCardsCreated += blueCardCount;
             }
         }
 
@@ -102,7 +101,8 @@ class Program
             players[i].DrawLottery(lottery, players[i].Raffles, players[i].Options);
         }
 
-        // 総払い出し額を計算して返す
-        return players.Sum(p => p.TotalPrizeMoney);
+        // 総払い出し額とBlueCard作成数を返す
+        int totalPayout = players.Sum(p => p.TotalPrizeMoney);
+        return (totalPayout, totalBlueCardsCreated);
     }
 }

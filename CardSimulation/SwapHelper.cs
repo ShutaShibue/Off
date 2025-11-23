@@ -28,7 +28,7 @@ public static class SwapHelper
                 // 50%の確率で何もしない
                 return 0;
             }
-            else if (randomValue < 0.83) // 0.5 + 0.33 = 0.83
+            else if (randomValue < 0.972)
             {
                 // 33%の確率で1回実行
                 executionCount = 1;
